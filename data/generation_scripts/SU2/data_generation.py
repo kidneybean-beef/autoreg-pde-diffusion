@@ -3,8 +3,8 @@ import os, shutil, sys, atexit
 from multiprocessing import Process
 from convert_data import convertFolderToNumpy, watchAndConvertFolder, createObstacleMask
 
-baseFolder = "SU2_raw"
-SU2path = "../build/bin/SU2_CFD"               # relative to baseFolder
+baseFolder = "/home/xinluo/fromsrc/SU2/SU2_raw"
+SU2path = "/home/xinluo/fromsrc/SU2/SU2_CFD"               # relative to baseFolder
 cfgNameSteady = "steady.cfg"                   # must be contained in baseFolder
 cfgNameInitial = "unsteady_2d_initial.cfg"
 cfgNameMain = "unsteady_2d_lowDissipation.cfg"
@@ -78,7 +78,7 @@ for id, mach in zip(simId, machs):
     if restartIter < 0:
         ### STEADY SIMULATION FOR 1000 STEPS TO INITIALIZE FLOW FIELD
         # call SU2 solver
-        result = os.system("mpiexec -n %d ../%s %s" % (threads, SU2path, cfgNameSteady))
+        result = os.system("mpiexec -n %d %s %s" % (threads, SU2path, cfgNameSteady))
         if result != 0:
             raise RuntimeError("Steady SU2 process failed! %s" % str(result))
 
@@ -89,7 +89,7 @@ for id, mach in zip(simId, machs):
 
         ### UNSTEADY SIMULATION FOR 100000 STEPS TO PASS TRANSIENT STAGE
         # call SU2 solver
-        result = os.system("mpiexec -n %d ../%s %s" % (threads, SU2path, cfgNameInitial))
+        result = os.system("mpiexec -n %d %s %s" % (threads, SU2path, cfgNameInitial))
         if result != 0:
             raise RuntimeError("Unsteady initial SU2 process failed! %s" % str(result))
 
@@ -117,7 +117,7 @@ for id, mach in zip(simId, machs):
         atexit.register(lambda proc : proc.terminate(), convertWatcher)
 
     # call SU2 solver
-    result = os.system("mpiexec -n %d ../%s %s" % (threads, SU2path, cfgNameMain))
+    result = os.system("mpiexec -n %d %s %s" % (threads, SU2path, cfgNameMain))
     if result != 0:
         raise RuntimeError("Main SU2 process failed! %s" % str(result))
 
